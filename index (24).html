@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Keep, Change, Flip</title>
+<meta name="description" content="Practice subtracting integers with Keep, Change, Flip. Play with the rule, then practice with feedback.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2F5DA8">
+<meta property="og:title" content="Keep, Change, Flip">
+<meta property="og:description" content="Turn a subtraction problem into an addition problem.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='5' width='7' height='22' rx='2' fill='%232F5DA8'/%3E%3Crect x='12.5' y='5' width='7' height='22' rx='2' fill='%23F2B134'/%3E%3Crect x='22' y='5' width='7' height='22' rx='2' fill='%23B8336A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6FB; --grid:#DCE5F2; --sheet:#FFFFFF; --ink:#16243F; --muted:#51607D; --line:#C9D4E5;
+  --keep:#2F5DA8; --keep-ink:#FFFFFF; --keep-tint:#E3ECFA;
+  --change:#F2B134; --change-ink:#16243F; --change-tint:#FDF1D6;
+  --flip:#B8336A; --flip-ink:#FFFFFF; --flip-tint:#F9E2EC;
+  --good:#1E7A4C; --good-tint:#DDF3E6; --bad:#B3261E; --bad-tint:#FBE3E1;
+  --hop:#0E7C86;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0F1829; --grid:#1A2640; --sheet:#16213A; --ink:#E9EFFA; --muted:#A3B1CC; --line:#2E3D5E;
+    --keep:#7BA4EE; --keep-ink:#0C1424; --keep-tint:#1C2F55;
+    --change:#F2B134; --change-ink:#16243F; --change-tint:#4A3A12;
+    --flip:#E57BA6; --flip-ink:#22091A; --flip-tint:#4A1D33;
+    --good:#5FCB92; --good-tint:#163D2B; --bad:#FF8A80; --bad-tint:#4A1F1F;
+    --hop:#4FD1DA;
+  }
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;
+  font-family:'Lexend',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  font-size:17px;line-height:1.5;color:var(--ink);
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:780px;margin:0 auto;padding:22px 16px 56px}
+
+/* step colors */
+.keep{--c:var(--keep);--t:var(--keep-tint);--ic:var(--keep-ink)}
+.change{--c:var(--change);--t:var(--change-tint);--ic:var(--change-ink)}
+.flip{--c:var(--flip);--t:var(--flip-tint);--ic:var(--flip-ink)}
+
+h1{margin:6px 0 10px;font-size:clamp(30px,8vw,54px);line-height:1.1;font-weight:700;letter-spacing:-.01em}
+.pill{display:inline-block;padding:.08em .4em .16em;border-radius:14px;margin:0 .16em .16em 0;background:var(--c);color:var(--ic)}
+.lede{margin:0 0 20px;color:var(--muted);font-size:19px}
+
+.sheet{background:var(--sheet);border:1.5px solid var(--line);border-radius:22px;padding:20px 20px 26px}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:0 0 20px}
+.tab{background:none;border:0;padding:10px 18px;font-size:18px;font-weight:600;color:var(--muted);border-bottom:4px solid transparent;margin-bottom:-2px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* student bar */
+.who{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:0 0 16px;padding-bottom:14px;border-bottom:2px solid var(--line)}
+.who label{display:flex;align-items:center;gap:8px;font-weight:600}
+.who input{font:inherit;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:var(--sheet);color:var(--ink);width:min(230px,44vw)}
+.who input#sPeriod{width:90px}
+.who-note{flex-basis:100%;margin:0;color:var(--muted);font-size:14px}
+.who .ghost{min-height:40px;padding:6px 14px;font-size:15px}
+
+/* pickers */
+.pickers{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-end;margin-bottom:18px}
+.plabel{display:block;font-size:15px;color:var(--muted);margin-bottom:4px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:46px;height:46px;border:2px solid var(--line);background:var(--sheet);border-radius:10px;font-size:26px;font-weight:600;line-height:1}
+.stepper button:hover{border-color:var(--ink)}
+.stepper output{min-width:58px;text-align:center;font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.ghost{background:transparent;border:2px solid var(--line);border-radius:12px;padding:10px 16px;font-weight:500;min-height:46px}
+.ghost:hover{border-color:var(--ink)}
+.primary{background:var(--ink);color:var(--sheet);border:2px solid var(--ink);border-radius:12px;padding:10px 22px;font-weight:600;font-size:18px;min-height:52px}
+.primary:disabled{opacity:.45;cursor:default}
+
+/* equation tiles */
+.eq{display:flex;align-items:flex-start;justify-content:center;gap:clamp(4px,1.6vw,12px);margin:6px 0 20px}
+.slot{display:flex;flex-direction:column;align-items:center;gap:10px;perspective:600px}
+.tile{
+  min-width:1.45em;height:1.6em;padding:0 .28em;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(26px,7.4vw,52px);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;
+  border:3px solid var(--line);border-radius:14px;background:var(--bg);
+  transition:background .2s,border-color .2s;
+}
+.tile.plain{border-color:transparent;background:transparent;min-width:.8em;padding:0}
+.tile.res{border-style:dashed;color:var(--muted)}
+.tile.res.known{border-style:solid;border-color:var(--good);background:var(--good-tint);color:var(--ink)}
+.tile[data-r="a"].on{border-color:var(--keep);background:var(--keep-tint)}
+.tile[data-r="op"].on{border-color:var(--change);background:var(--change-tint)}
+.tile[data-r="b"].on{border-color:var(--flip);background:var(--flip-tint)}
+.tile.spin{animation:spin .45s ease-in-out}
+@keyframes spin{from{transform:rotateX(0)}to{transform:rotateX(360deg)}}
+.cap{font-size:13px;font-weight:600;line-height:1;padding:6px 11px;border-radius:999px;border:2px dashed var(--line);color:var(--muted);transition:background .2s}
+.cap.on{background:var(--c);border:2px solid var(--c);color:var(--ic)}
+
+/* step buttons */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stepbtn{text-align:left;border:2px solid var(--c);background:var(--t);border-radius:14px;padding:12px 10px;min-height:88px}
+.stepbtn .sn{display:block;font-size:clamp(18px,4.6vw,24px);font-weight:700;line-height:1.2}
+.stepbtn .sd{display:block;font-size:13px;line-height:1.35;margin-top:5px;color:var(--muted)}
+.stepbtn[aria-pressed="true"]{background:var(--c);color:var(--ic)}
+.stepbtn[aria-pressed="true"] .sd{color:inherit}
+.stepbtn[aria-pressed="true"] .sn::after{content:" \2713"}
+
+.msg{margin:16px 0 0;padding:12px 14px;border-left:6px solid var(--keep);background:var(--bg);border-radius:0 12px 12px 0;max-width:62ch;min-height:3.4em}
+.msg.good{border-left-color:var(--good)}
+.msg.bad{border-left-color:var(--bad);background:var(--bad-tint)}
+.msg.good::before{content:"\2713  ";font-weight:700;color:var(--good)}
+.msg.bad::before{content:"\2715  ";font-weight:700;color:var(--bad)}
+.row{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* add panel */
+.addpanel{margin-top:22px;padding-top:18px;border-top:2px solid var(--line)}
+h2{font-size:22px;margin:0 0 10px;line-height:1.25}
+.nl{margin-top:12px;min-height:150px}
+.nlsvg{display:block;max-width:100%}
+.axis{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.tick{stroke:var(--muted);stroke-width:2}
+.tick.zero{stroke:var(--ink);stroke-width:3}
+.lab{fill:var(--muted);font-family:inherit;font-size:13px;font-weight:500}
+.lab.st{fill:var(--ink);font-weight:700;font-size:15px}
+.lab.en{fill:var(--hop);font-weight:700;font-size:17px}
+.hop{fill:none;stroke:var(--hop);stroke-width:4;stroke-linecap:round}
+.head path{fill:var(--hop)}
+.dot.st{fill:var(--sheet);stroke:var(--ink);stroke-width:3}
+.dot.en{fill:var(--hop);stroke:var(--sheet);stroke-width:3}
+.nlsvg .head,.nlsvg .dot.en,.nlsvg .lab.en{opacity:0;transition:opacity .25s}
+.nlsvg.show .head,.nlsvg.show .dot.en,.nlsvg.show .lab.en{opacity:1}
+.nl-cap{margin:8px 0 0;max-width:62ch}
+
+details{margin-top:22px}
+summary{font-weight:600;cursor:pointer;padding:6px 0}
+details p{margin:6px 0;max-width:62ch}
+
+/* practice */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.levels button{text-align:left;background:var(--sheet);border:2px solid var(--line);border-radius:12px;padding:8px 12px}
+.levels button b{display:block;font-size:16px}
+.levels button span{display:block;font-size:13px;color:var(--muted);line-height:1.3}
+.levels button[aria-pressed="true"]{border-color:var(--ink);background:var(--bg)}
+.score{display:flex;gap:22px;margin:0 0 8px;color:var(--muted);font-size:15px}
+.score b{color:var(--ink);font-size:20px}
+.prompt{font-size:20px;font-weight:600;margin:0 0 12px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{min-height:68px;font-size:clamp(20px,5.4vw,28px);font-weight:600;background:var(--sheet);border:2px solid var(--line);border-radius:14px;padding:8px 10px;font-variant-numeric:tabular-nums}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.wrong{background:var(--bad-tint);border-color:var(--bad);color:var(--ink);opacity:.85}
+.opt.right{background:var(--good-tint);border-color:var(--good)}
+.answer{display:flex;gap:10px;align-items:center;margin:4px 0 6px;flex-wrap:wrap}
+.signbtn{width:56px;height:56px;border:2px solid var(--ink);border-radius:12px;background:var(--sheet);font-size:30px;font-weight:700;line-height:1}
+.digits{width:104px;height:56px;border:2px solid var(--ink);border-radius:12px;background:var(--sheet);color:var(--ink);font:inherit;font-size:30px;font-weight:700;text-align:center}
+.digits:disabled,.signbtn:disabled{opacity:.5}
+
+@media (max-width:480px){
+  .sheet{padding:16px 14px 22px;border-radius:18px}
+  .tab{padding:10px 12px}
+  .stepbtn{padding:10px 8px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 aria-label="Keep, Change, Flip"><span class="pill keep">Keep</span><span class="pill change">Change</span><span class="pill flip">Flip</span></h1>
+    <p class="lede">Turn a subtraction problem into an addition problem.</p>
+  </header>
+
+  <div class="sheet">
+    <div class="who">
+      <label>Name <input type="text" id="sName" autocomplete="off" maxlength="60"></label>
+      <label>Period <input type="text" id="sPeriod" autocomplete="off" inputmode="numeric" maxlength="6"></label>
+      <button type="button" class="ghost" id="sReset">New student</button>
+      <p class="who-note" id="whoNote"></p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Choose a mode">
+      <button class="tab" role="tab" id="tab-play" aria-selected="true" aria-controls="panel-play" type="button">Play</button>
+      <button class="tab" role="tab" id="tab-practice" aria-selected="false" aria-controls="panel-practice" type="button">Practice</button>
+    </div>
+
+    <!-- PLAY -->
+    <section id="panel-play" role="tabpanel" aria-labelledby="tab-play">
+      <div class="pickers">
+        <div>
+          <span class="plabel" id="lab-a">First number</span>
+          <div class="stepper" role="group" aria-labelledby="lab-a">
+            <button type="button" data-t="a" data-d="-1" aria-label="First number: go down by one">&minus;</button>
+            <output id="val-a" aria-live="polite">5</output>
+            <button type="button" data-t="a" data-d="1" aria-label="First number: go up by one">+</button>
+          </div>
+        </div>
+        <div>
+          <span class="plabel" id="lab-b">Second number</span>
+          <div class="stepper" role="group" aria-labelledby="lab-b">
+            <button type="button" data-t="b" data-d="-1" aria-label="Second number: go down by one">&minus;</button>
+            <output id="val-b" aria-live="polite">3</output>
+            <button type="button" data-t="b" data-d="1" aria-label="Second number: go up by one">+</button>
+          </div>
+        </div>
+        <button type="button" class="ghost" id="surprise">Surprise me</button>
+      </div>
+
+      <div class="eq" id="eq-play" role="group"></div>
+
+      <div class="steps">
+        <button type="button" class="stepbtn keep" id="b-keep" aria-pressed="false"><span class="sn">Keep</span><span class="sd">The first number stays.</span></button>
+        <button type="button" class="stepbtn change" id="b-change" aria-pressed="false"><span class="sn">Change</span><span class="sd">&minus; becomes +.</span></button>
+        <button type="button" class="stepbtn flip" id="b-flip" aria-pressed="false"><span class="sn">Flip</span><span class="sd">The second number switches sign.</span></button>
+      </div>
+
+      <div class="msg info" id="play-msg" role="status" aria-live="polite"></div>
+
+      <div class="addpanel" id="play-add" hidden>
+        <h2>Now add</h2>
+        <button type="button" class="primary" id="play-show">Show me on the number line</button>
+        <div class="nl" id="play-nl" hidden></div>
+        <p class="nl-cap" id="play-nl-cap" hidden></p>
+      </div>
+
+      <div class="row"><button type="button" class="ghost" id="play-reset">Start over</button></div>
+
+      <details>
+        <summary>Why does this work?</summary>
+        <p>Subtracting a number gives the same answer as adding its opposite.</p>
+        <p>5 &minus; 3 and 5 + (&minus;3) both move you 3 steps left from 5.</p>
+        <p>5 &minus; (&minus;3) and 5 + 3 both move you 3 steps right from 5.</p>
+        <p>That is why we Change &minus; to + and Flip the second number.</p>
+      </details>
+    </section>
+
+    <!-- PRACTICE -->
+    <section id="panel-practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+      <div class="levels" role="group" aria-label="Choose a level">
+        <button type="button" data-l="1" aria-pressed="true"><b>Level 1</b><span>Positive numbers</span></button>
+        <button type="button" data-l="2" aria-pressed="false"><b>Level 2</b><span>Subtract a negative</span></button>
+        <button type="button" data-l="3" aria-pressed="false"><b>Level 3</b><span>Start with a negative</span></button>
+        <button type="button" data-l="4" aria-pressed="false"><b>Level 4</b><span>A mix of everything</span></button>
+      </div>
+      <p class="score" id="score"></p>
+
+      <div class="eq" id="eq-practice" role="group"></div>
+
+      <p class="prompt" id="q-prompt"></p>
+      <div class="options" id="q-options"></div>
+
+      <div class="answer" id="q-answer" hidden>
+        <button type="button" class="signbtn" id="signbtn" aria-label="Sign of your answer: positive. Press to switch.">+</button>
+        <input class="digits" id="digits" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-label="Your answer, number only">
+        <button type="button" class="primary" id="check">Check</button>
+      </div>
+      <div class="row"><button type="button" class="ghost" id="help" hidden>Show me on the number line</button></div>
+
+      <div class="msg info" id="q-msg" role="status" aria-live="polite"></div>
+
+      <div class="nl" id="q-nl" hidden></div>
+      <p class="nl-cap" id="q-nl-cap" hidden></p>
+
+      <div class="row"><button type="button" class="primary" id="next" hidden>Next problem</button></div>
+
+      <details>
+        <summary>Need a reminder?</summary>
+        <p><b>Keep</b> the first number the same.</p>
+        <p><b>Change</b> &minus; to +.</p>
+        <p><b>Flip</b> the sign of the second number. Positive becomes negative. Negative becomes positive.</p>
+        <p>Then add. Adding a positive number moves right. Adding a negative number moves left.</p>
+      </details>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var M='\u2212';
+function $(s,r){return (r||document).querySelector(s)}
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmtFirst(n){return n<0?M+Math.abs(n):String(n)}
+function fmtSecond(n){return n<0?'('+M+Math.abs(n)+')':String(n)}
+function expr(a,op,b){return fmtFirst(a)+' '+op+' '+fmtSecond(b)}
+function rnd(lo,hi){return Math.floor(Math.random()*(hi-lo+1))+lo}
+function nz(lo,hi){var n=0;while(n===0)n=rnd(lo,hi);return n}
+function shuffle(arr){for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t}return arr}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+/* ---------- Classroom Logger ----------
+   Sends student activity to the Google Sheet "Classroom logger bms 2026" (tab "Log")
+   through the same Apps Script webhook used by the other apps.
+   To turn logging off, set enabled to false. */
+var LOGGER = {
+  url: "https://script.google.com/macros/s/AKfycbwV7Hd_JRL54Xbxm2tiAFx3kWm_WFO5nxSotzCD0PiAuEYtx4Z3AlTQ3UwwJYrsOKS6/exec",
+  app: "keep-change-flip",
+  enabled: true
+};
+var student = {name:'', period:''};
+var SKEY = 'kcf-student-v1';
+try{
+  var savedStudent = JSON.parse(localStorage.getItem(SKEY) || 'null');
+  if(savedStudent){ student.name = savedStudent.name || ''; student.period = savedStudent.period || ''; }
+}catch(e){}
+function saveStudent(){ try{ localStorage.setItem(SKEY, JSON.stringify(student)); }catch(e){} }
+var hasLoggedStart = false;
+function sendLog(payload){
+  if(!LOGGER.enabled || !LOGGER.url) return;
+  try{
+    var p = fetch(LOGGER.url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)});
+    if(p && p.catch) p.catch(function(){});
+  }catch(e){ /* never block a student's work because logging failed */ }
+}
+function logEvent(extra){
+  try{
+    var base = {app:LOGGER.app, student:((student.name || '').trim() || 'unknown'), period:((student.period || '').trim())};
+    if(!hasLoggedStart && extra.event !== 'start'){ hasLoggedStart = true; sendLog(Object.assign({}, base, {event:'start'})); }
+    if(extra.event === 'start') hasLoggedStart = true;
+    sendLog(Object.assign({}, base, extra));
+  }catch(e){}
+}
+
+/* ---------- equation tiles ---------- */
+function buildEq(host){
+  host.innerHTML=
+    '<div class="slot"><div class="tile" data-r="a"></div><span class="cap keep">Keep</span></div>'+
+    '<div class="slot"><div class="tile" data-r="op"></div><span class="cap change">Change</span></div>'+
+    '<div class="slot"><div class="tile" data-r="b"></div><span class="cap flip">Flip</span></div>'+
+    '<div class="slot"><div class="tile plain" aria-hidden="true">=</div></div>'+
+    '<div class="slot"><div class="tile res" data-r="res"></div></div>';
+  function q(r){return host.querySelector('[data-r="'+r+'"]')}
+  var t={a:q('a'),op:q('op'),b:q('b'),res:q('res')};
+  var caps={a:host.querySelector('.cap.keep'),op:host.querySelector('.cap.change'),b:host.querySelector('.cap.flip')};
+  function setText(el,text,spin){
+    if(el.textContent===text)return;
+    clearTimeout(el._t);
+    if(spin&&!reduce&&el.textContent){
+      el.classList.remove('spin');void el.offsetWidth;el.classList.add('spin');
+      el._t=setTimeout(function(){el.textContent=text},170);
+    }else{el.textContent=text}
+  }
+  return {set:function(s,spin){
+    setText(t.a,fmtFirst(s.a),false);
+    setText(t.op,s.op,spin);
+    setText(t.b,fmtSecond(s.b),spin);
+    t.a.classList.toggle('on',!!s.kept);caps.a.classList.toggle('on',!!s.kept);
+    t.op.classList.toggle('on',!!s.changed);caps.op.classList.toggle('on',!!s.changed);
+    t.b.classList.toggle('on',!!s.flipped);caps.b.classList.toggle('on',!!s.flipped);
+    var known=s.result!==null&&s.result!==undefined;
+    t.res.textContent=known?fmtFirst(s.result):'?';
+    t.res.classList.toggle('known',known);
+    host.setAttribute('aria-label','Equation: '+expr(s.a,s.op,s.b)+' equals '+(known?fmtFirst(s.result):'not solved yet'));
+  }};
+}
+
+/* ---------- number line ---------- */
+function addExplain(a,m){
+  var end=a+m;
+  if(m===0)return 'Adding 0 moves you nowhere. You stay on <b>'+fmtFirst(a)+'</b>.';
+  var dir=m<0?'left':'right';
+  var kind=m<0?'a negative number':'a positive number';
+  var n=Math.abs(m);
+  return 'Start at <b>'+fmtFirst(a)+'</b>. Adding '+kind+' moves you <b>'+dir+' '+n+'</b> '+(n===1?'step':'steps')+'. You land on <b>'+fmtFirst(end)+'</b>.';
+}
+function drawNL(host,start,move,animate,done){
+  clearTimeout(host._t);
+  host._args=[start,move];
+  var W=Math.max(260,Math.floor(host.clientWidth)||600);
+  var H=150,y0=92,pad=20;
+  var end=start+move;
+  var lo=Math.min(0,start,end)-2,hi=Math.max(0,start,end)+2;
+  var unit=(W-2*pad)/(hi-lo);
+  function X(v){return pad+(v-lo)*unit}
+  var need=30/unit;
+  var every=need<=1?1:need<=2?2:need<=5?5:10;
+  var special=[0,start,end];
+  var s='<svg class="nlsvg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Number line. Start at '+fmtFirst(start)+'. Move '+fmtFirst(move)+'. Land on '+fmtFirst(end)+'.">';
+  s+='<line class="axis" x1="'+(pad/2)+'" y1="'+y0+'" x2="'+(W-pad/2)+'" y2="'+y0+'"/>';
+  for(var v=lo;v<=hi;v++){
+    var isSp=special.indexOf(v)>-1;
+    var label=isSp;
+    if(!isSp&&v%every===0){
+      label=!special.some(function(sv){return Math.abs(sv-v)*unit<28});
+    }
+    var th=label?9:5;
+    s+='<line class="tick'+(v===0?' zero':'')+'" x1="'+X(v)+'" y1="'+(y0-th)+'" x2="'+X(v)+'" y2="'+(y0+th)+'"/>';
+    if(label){
+      s+='<text class="lab'+(v===start?' st':'')+(v===end?' en':'')+'" x="'+X(v)+'" y="'+(y0+32)+'" text-anchor="middle">'+fmtFirst(v)+'</text>';
+    }
+  }
+  if(move!==0){
+    var x1=X(start),x2=X(end),ay=y0-11;
+    var h=Math.min(64,14+Math.abs(move)*unit*0.2);
+    var xm=(x1+x2)/2;
+    s+='<path class="hop" d="M'+x1+' '+ay+' Q'+xm+' '+(ay-2*h)+' '+x2+' '+ay+'"/>';
+    var ang=Math.atan2(2*h,x2-xm)*180/Math.PI;
+    s+='<g class="head" transform="translate('+x2+' '+ay+') rotate('+ang+')"><path d="M0 0 L-12 -7 L-12 7 Z"/></g>';
+  }
+  s+='<circle class="dot st" cx="'+X(start)+'" cy="'+y0+'" r="9"/>';
+  if(move!==0)s+='<circle class="dot en" cx="'+X(end)+'" cy="'+y0+'" r="9"/>';
+  s+='</svg>';
+  host.innerHTML=s;
+  var svg=host.firstChild;
+  function reveal(){svg.classList.add('show');if(done)done()}
+  if(move===0){reveal();return}
+  var path=svg.querySelector('.hop');
+  var len=1000;try{len=path.getTotalLength()}catch(e){}
+  path.style.strokeDasharray=len;
+  if(animate&&!reduce){
+    path.style.strokeDashoffset=len;
+    void path.getBoundingClientRect();
+    path.style.transition='stroke-dashoffset 900ms ease-in-out';
+    path.style.strokeDashoffset=0;
+    host._t=setTimeout(reveal,950);
+  }else{
+    path.style.strokeDashoffset=0;
+    reveal();
+  }
+}
+
+/* ---------- PLAY ---------- */
+var P={a:5,b:3,count:0,loggedKcf:false,kept:false,changed:false,flipped:false,shown:false,revealed:false,
+  msg:'Pick two numbers, then press Keep, Change, and Flip. Any order works.',kind:'info'};
+var eqP=buildEq($('#eq-play'));
+function allDone(){return P.kept&&P.changed&&P.flipped}
+function renderPlay(spin){
+  var done=allDone();
+  eqP.set({a:P.a,op:P.changed?'+':M,b:P.flipped?-P.b:P.b,kept:P.kept,changed:P.changed,flipped:P.flipped,
+    result:(done&&P.revealed)?P.a-P.b:null},spin);
+  $('#val-a').textContent=fmtFirst(P.a);
+  $('#val-b').textContent=fmtFirst(P.b);
+  $('#b-keep').setAttribute('aria-pressed',String(P.kept));
+  $('#b-change').setAttribute('aria-pressed',String(P.changed));
+  $('#b-flip').setAttribute('aria-pressed',String(P.flipped));
+  var m=$('#play-msg');m.className='msg '+P.kind;m.textContent=P.msg;
+  $('#play-add').hidden=!done;
+  $('#play-show').hidden=P.shown;
+  $('#play-nl').hidden=!P.shown;
+  $('#play-nl-cap').hidden=!P.shown;
+}
+function resetSteps(){P.kept=false;P.changed=false;P.flipped=false;P.shown=false;P.revealed=false}
+function newPlayProblem(text){
+  resetSteps();P.loggedKcf=false;
+  P.msg=text||('New problem: '+expr(P.a,M,P.b)+'. Press Keep, Change, and Flip.');
+  P.kind='info';
+  renderPlay(false);
+}
+function stepPress(which){
+  var key={keep:'kept',change:'changed',flip:'flipped'}[which];
+  var was=P[key];
+  P[key]=!was;P.shown=false;P.revealed=false;
+  var text;
+  if(was)text=cap(which)+' undone.';
+  else if(which==='keep')text='Keep: the first number stays exactly the same. '+fmtFirst(P.a)+' stays '+fmtFirst(P.a)+'.';
+  else if(which==='change')text='Change: the subtraction sign becomes an addition sign.';
+  else if(P.b===0)text='Flip: 0 is not positive or negative, so it stays 0.';
+  else if(P.b>0)text='Flip: the second number switches sign. '+P.b+' becomes '+fmtSecond(-P.b)+'.';
+  else text='Flip: the second number switches sign. '+fmtSecond(P.b)+' becomes '+(-P.b)+'.';
+  var done=allDone();
+  if(done&&!P.loggedKcf){
+    P.loggedKcf=true;P.count++;
+    logEvent({event:'kcf-complete',station:'play',stageIndex:P.count,correct:true,text:'Problem: '+expr(P.a,M,P.b)+' becomes '+expr(P.a,'+',-P.b)});
+  }
+  if(done)text+=' All three done! Your problem is now '+expr(P.a,'+',-P.b)+'.';
+  P.msg=text;P.kind=done?'good':'info';
+  renderPlay(which!=='keep');
+}
+$('#b-keep').addEventListener('click',function(){stepPress('keep')});
+$('#b-change').addEventListener('click',function(){stepPress('change')});
+$('#b-flip').addEventListener('click',function(){stepPress('flip')});
+document.querySelectorAll('.stepper button').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var t=btn.getAttribute('data-t'),d=parseInt(btn.getAttribute('data-d'),10);
+    P[t]=Math.max(-9,Math.min(9,P[t]+d));
+    newPlayProblem();
+  });
+});
+$('#surprise').addEventListener('click',function(){P.a=nz(-9,9);P.b=nz(-9,9);newPlayProblem()});
+$('#play-reset').addEventListener('click',function(){newPlayProblem('Start over: '+expr(P.a,M,P.b)+'. Press Keep, Change, and Flip.')});
+$('#play-show').addEventListener('click',function(){
+  P.shown=true;P.revealed=false;
+  logEvent({event:'numberline',station:'play',stageIndex:P.count,correct:true,text:'Problem: '+expr(P.a,M,P.b)+' = '+fmtFirst(P.a-P.b)});
+  renderPlay(false);
+  var m=-P.b;
+  $('#play-nl-cap').innerHTML=addExplain(P.a,m);
+  drawNL($('#play-nl'),P.a,m,true,function(){
+    if(!P.shown)return;
+    P.revealed=true;
+    P.msg=expr(P.a,'+',m)+' = '+fmtFirst(P.a-P.b)+'. And '+expr(P.a,M,P.b)+' = '+fmtFirst(P.a-P.b)+' too. Same answer.';
+    P.kind='good';
+    renderPlay(false);
+  });
+});
+
+/* ---------- PRACTICE ---------- */
+var Q={level:1,id:0,p:null,stage:1,missed:false,tries:0,streak:0,solved:0,clean:0,n:0,kmiss:0,sign:1};
+var eqQ=buildEq($('#eq-practice'));
+function makeProblem(level,prev){
+  var a,b;
+  do{
+    if(level===1){a=rnd(1,9);b=rnd(1,9)}
+    else if(level===2){a=rnd(1,9);b=-rnd(1,9)}
+    else if(level===3){a=-rnd(1,9);b=rnd(1,9)}
+    else{a=nz(-9,9);b=nz(-9,9)}
+  }while(prev&&prev.a===a&&prev.b===b);
+  return {a:a,b:b};
+}
+function renderScore(){
+  $('#score').innerHTML='<span><b>'+Q.streak+'</b> in a row</span><span><b>'+Q.solved+'</b> solved</span>';
+}
+function setQMsg(text,kind){var m=$('#q-msg');m.className='msg '+(kind||'info');m.textContent=text}
+function markMissed(){if(!Q.missed){Q.missed=true;Q.streak=0;renderScore()}}
+function hideNL(){
+  var h=$('#q-nl');clearTimeout(h._t);h.hidden=true;h.innerHTML='';h._args=null;
+  $('#q-nl-cap').hidden=true;
+}
+function newProblem(){
+  Q.id++;Q.n++;Q.kmiss=0;
+  Q.p=makeProblem(Q.level,Q.p);
+  Q.missed=false;Q.tries=0;Q.sign=1;
+  stage1();
+}
+function stage1(){
+  Q.stage=1;
+  var a=Q.p.a,b=Q.p.b;
+  eqQ.set({a:a,op:M,b:b,kept:false,changed:false,flipped:false,result:null},false);
+  $('#q-prompt').textContent='Which one is the correct Keep, Change, Flip?';
+  var opts=[
+    {t:expr(a,'+',-b),ok:true,code:'correct'},
+    {t:expr(a,'+',b),code:'changed-only',why:'You changed \u2212 to +, but you did not Flip the second number.'},
+    {t:expr(a,M,-b),code:'flipped-only',why:'You flipped the second number, but the sign is still \u2212. Change it to +.'},
+    {t:expr(-a,'+',-b),code:'flipped-both',why:'You flipped both numbers. Keep means the first number stays the same. Only the second number flips.'}
+  ];
+  shuffle(opts);
+  var box=$('#q-options');box.hidden=false;box.innerHTML='';
+  opts.forEach(function(o){
+    var bt=document.createElement('button');
+    bt.type='button';bt.className='opt';bt.textContent=o.t;
+    bt.addEventListener('click',function(){pick(bt,o)});
+    box.appendChild(bt);
+  });
+  $('#q-answer').hidden=true;$('#help').hidden=true;$('#next').hidden=true;
+  hideNL();
+  setQMsg('Problem: '+expr(a,M,b)+'. Tap the correct way to rewrite it.','info');
+  renderScore();
+}
+function pick(btn,o){
+  logEvent({event:'kcf-choice',station:'practice-L'+Q.level+'-kcf',stageIndex:Q.n,correct:!!o.ok,text:'Problem: '+expr(Q.p.a,M,Q.p.b)+' | picked: '+o.t+' ['+o.code+']'});
+  if(!o.ok)Q.kmiss++;
+  if(o.ok){btn.classList.add('right');stage2()}
+  else{
+    btn.classList.add('wrong');btn.disabled=true;
+    btn.insertAdjacentHTML('beforeend','<span aria-hidden="true"> \u2715</span>');
+    markMissed();
+    setQMsg(o.why+' Try another one.','bad');
+  }
+}
+function setSign(s){
+  Q.sign=s;
+  var b=$('#signbtn');
+  b.textContent=s<0?M:'+';
+  b.setAttribute('aria-label','Sign of your answer: '+(s<0?'negative':'positive')+'. Press to switch.');
+}
+function stage2(){
+  Q.stage=2;
+  var a=Q.p.a,b=Q.p.b,m=-b;
+  eqQ.set({a:a,op:'+',b:m,kept:true,changed:true,flipped:true,result:null},true);
+  $('#q-options').hidden=true;
+  $('#q-prompt').textContent='Now add. What is '+expr(a,'+',m)+'?';
+  $('#q-answer').hidden=false;$('#help').hidden=false;
+  var d=$('#digits');d.value='';d.disabled=false;
+  $('#check').disabled=false;$('#signbtn').disabled=false;$('#help').disabled=false;
+  setSign(1);
+  setQMsg('Yes! You kept the first number, changed \u2212 to +, and flipped the second number.','good');
+  d.focus();
+}
+function showHint(animate,done){
+  var a=Q.p.a,m=-Q.p.b;
+  var h=$('#q-nl');h.hidden=false;
+  $('#q-nl-cap').hidden=false;
+  $('#q-nl-cap').innerHTML=addExplain(a,m);
+  drawNL(h,a,m,animate,done);
+}
+function check(){
+  var raw=$('#digits').value.trim();
+  if(!raw){setQMsg('Type a number first, then press Check.','info');return}
+  var ans=(Q.sign*parseInt(raw,10))||0;
+  var a=Q.p.a,m=-Q.p.b,right=a+m,b=Q.p.b;
+  if(ans===right){
+    var pid=Q.id;
+    $('#digits').disabled=true;$('#check').disabled=true;$('#signbtn').disabled=true;$('#help').hidden=true;
+    Q.solved++;
+    if(!Q.missed){Q.streak++;Q.clean++;}
+    logEvent({event:'answer',station:'practice-L'+Q.level+'-add',stageIndex:Q.n,correct:true,text:'Problem: '+expr(a,M,b)+' | typed: '+fmtFirst(ans)});
+    logEvent({event:'problem-complete',station:'practice-L'+Q.level,stageIndex:Q.n,correct:!Q.missed,stars:Q.clean,text:'Problem: '+expr(a,M,b)+' = '+fmtFirst(right)+' | wrong KCF picks: '+Q.kmiss+', wrong answers: '+Q.tries});
+    renderScore();
+    setQMsg('Correct! '+expr(a,'+',m)+' = '+fmtFirst(right)+'. So '+expr(a,M,b)+' = '+fmtFirst(right)+'.','good');
+    showHint(true,function(){
+      if(pid!==Q.id)return;
+      eqQ.set({a:a,op:'+',b:m,kept:true,changed:true,flipped:true,result:right},false);
+    });
+    var nx=$('#next');nx.hidden=false;
+    if(reduce)nx.focus();
+  }else{
+    Q.tries++;markMissed();
+    var kind=(ans===a-m)?'wrong-direction':(ans===-right)?'wrong-sign':'other';
+    logEvent({event:'answer',station:'practice-L'+Q.level+'-add',stageIndex:Q.n,correct:false,text:'Problem: '+expr(a,M,b)+' | typed: '+fmtFirst(ans)+' ['+kind+']'});
+    var text;
+    var dirText=m<0?'Adding a negative number moves left.':'Adding a positive number moves right.';
+    if(ans===a-m)text='You moved the wrong way. '+dirText+' Try again.';
+    else if(ans===-right)text='Right size, wrong sign. Is your answer left or right of zero? Try again.';
+    else text='Not yet. Start at '+fmtFirst(a)+'. '+dirText+' Move '+Math.abs(m)+' '+(Math.abs(m)===1?'step':'steps')+'. Try again.';
+    setQMsg(text,'bad');
+    if(Q.tries>=2&&$('#q-nl').hidden)showHint(true);
+    $('#digits').select();
+  }
+}
+$('#signbtn').addEventListener('click',function(){setSign(Q.sign>0?-1:1);$('#digits').focus()});
+$('#digits').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,2)});
+$('#digits').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();check()}
+  else if(e.key==='-'||e.key==='\u2212'){e.preventDefault();setSign(-1)}
+  else if(e.key==='+'){e.preventDefault();setSign(1)}
+});
+$('#check').addEventListener('click',check);
+$('#help').addEventListener('click',function(){
+  logEvent({event:'hint',station:'practice-L'+Q.level+'-add',stageIndex:Q.n,text:'Problem: '+expr(Q.p.a,M,Q.p.b)+' | number line requested'});
+  markMissed();
+  showHint(true);
+  setQMsg('Here is the hop. Follow it, then type where you land.','info');
+});
+$('#next').addEventListener('click',function(){newProblem();});
+document.querySelectorAll('.levels button').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    Q.level=parseInt(btn.getAttribute('data-l'),10);
+    document.querySelectorAll('.levels button').forEach(function(b){b.setAttribute('aria-pressed',String(b===btn))});
+    Q.streak=0;
+    logEvent({event:'level',station:'practice',stageIndex:Q.level,text:'Level '+Q.level});
+    newProblem();
+  });
+});
+
+/* ---------- tabs ---------- */
+var tabs=[$('#tab-play'),$('#tab-practice')];
+function redrawVisible(){
+  ['#play-nl','#q-nl'].forEach(function(id){
+    var h=$(id);
+    if(h&&!h.hidden&&h._args)drawNL(h,h._args[0],h._args[1],false);
+  });
+}
+function showTab(which){
+  var play=which==='play';
+  $('#panel-play').hidden=!play;
+  $('#panel-practice').hidden=play;
+  $('#tab-play').setAttribute('aria-selected',String(play));
+  $('#tab-practice').setAttribute('aria-selected',String(!play));
+  redrawVisible();
+}
+$('#tab-play').addEventListener('click',function(){showTab('play')});
+$('#tab-practice').addEventListener('click',function(){showTab('practice')});
+tabs.forEach(function(tb,i){
+  tb.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+      var n=tabs[(i+1)%2];n.focus();n.click();
+    }
+  });
+});
+var rt;
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(redrawVisible,150)});
+
+/* ---------- student name and period ---------- */
+function updateWho(){
+  $('#whoNote').textContent = (student.name || '').trim() ? 'Your teacher can see your practice.' : 'Type your name first so your teacher can see your work.';
+}
+$('#sName').value = student.name; $('#sPeriod').value = student.period; updateWho();
+$('#sName').addEventListener('input', function(){ student.name = this.value; saveStudent(); updateWho(); });
+$('#sPeriod').addEventListener('input', function(){ student.period = this.value; saveStudent(); });
+$('#sReset').addEventListener('click', function(){
+  student.name = ''; student.period = ''; saveStudent();
+  $('#sName').value = ''; $('#sPeriod').value = '';
+  hasLoggedStart = false; P.count = 0;
+  Q.streak = 0; Q.solved = 0; Q.clean = 0;
+  newPlayProblem('Ready for a new student. Type your name, then press Keep, Change, and Flip.');
+  newProblem(); updateWho(); $('#sName').focus();
+});
+
+/* ---------- start ---------- */
+renderPlay(false);
+newProblem();
+})();
+</script>
+<noscript>This page needs JavaScript. Please turn it on and reload.</noscript>
+</body>
+</html>
